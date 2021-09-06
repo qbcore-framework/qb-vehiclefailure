@@ -78,11 +78,13 @@ function CleanVehicle(vehicle)
 	local ped = PlayerPedId()
 	local pos = GetEntityCoords(ped)
 	TaskStartScenarioInPlace(ped, "WORLD_HUMAN_MAID_CLEAN", 0, true)
+	LocalPlayer.state:set("inv_busy", true, true)
 	QBCore.Functions.Progressbar("cleaning_vehicle", "Cleaning the car...", math.random(10000, 20000), false, true, {
 		disableMovement = true,
 		disableCarMovement = true,
 		disableMouse = false,
 		disableCombat = true,
+		LocalPlayer.state:set("inv_busy", false, true)	
 	}, {}, {}, {}, function() -- Done
 		QBCore.Functions.Notify("Vehicle cleaned!")
 		SetVehicleDirtLevel(vehicle, 0.1)
@@ -92,7 +94,9 @@ function CleanVehicle(vehicle)
 		TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["cleaningkit"], "remove")
 		ClearAllPedProps(ped)
 		ClearPedTasks(ped)
+		LocalPlayer.state:set("inv_busy", false, true)	
 	end, function() -- Cancel
+			LocalPlayer.state:set("inv_busy", false, true)
 		QBCore.Functions.Notify("Failed!", "error")
 		ClearAllPedProps(ped)
 		ClearPedTasks(ped)
@@ -146,6 +150,7 @@ function RepairVehicleFull(vehicle)
     else
         SetVehicleDoorOpen(vehicle, 4, false, false)
     end
+	LocalPlayer.state:set("inv_busy", true, true)	
 	QBCore.Functions.Progressbar("repair_vehicle", "Repairing vehicle..", math.random(20000, 30000), false, true, {
 		disableMovement = true,
 		disableCarMovement = true,
@@ -171,8 +176,10 @@ function RepairVehicleFull(vehicle)
 			SetVehicleDoorShut(vehicle, 4, false)
 		end
 		TriggerServerEvent('qb-vehiclefailure:removeItem', "advancedrepairkit")
+		LocalPlayer.state:set("inv_busy", false, true)	
 	end, function() -- Cancel
 		StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
+		LocalPlayer.state:set("inv_busy", false, true)	
 		QBCore.Functions.Notify("Failed!", "error")
 		if (IsBackEngine(GetEntityModel(vehicle))) then
 			SetVehicleDoorShut(vehicle, 5, false)
@@ -188,6 +195,7 @@ function RepairVehicle(vehicle)
     else
         SetVehicleDoorOpen(vehicle, 4, false, false)
     end
+	LocalPlayer.state:set("inv_busy", true, true)
 	QBCore.Functions.Progressbar("repair_vehicle", "Repairing vehicle..", math.random(10000, 20000), false, true, {
 		disableMovement = true,
 		disableCarMovement = true,
@@ -197,6 +205,7 @@ function RepairVehicle(vehicle)
 		animDict = "mini@repair",
 		anim = "fixing_a_player",
 		flags = 16,
+		LocalPlayer.state:set("inv_busy", false, true)	
 	}, {}, {}, function() -- Done
 		StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
 		QBCore.Functions.Notify("Vehicle repaired!")
@@ -213,8 +222,10 @@ function RepairVehicle(vehicle)
 			SetVehicleDoorShut(vehicle, 4, false)
 		end
 		TriggerServerEvent('qb-vehiclefailure:removeItem', "repairkit")
+		LocalPlayer.state:set("inv_busy", false, true)	
 	end, function() -- Cancel
 		StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
+		LocalPlayer.state:set("inv_busy", false, true)	
 		QBCore.Functions.Notify("Failed!", "error")
 		if (IsBackEngine(GetEntityModel(vehicle))) then
 			SetVehicleDoorShut(vehicle, 5, false)
