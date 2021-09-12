@@ -8,19 +8,16 @@ local fEngineDamageMult = 0.0
 local fBrakeForce = 1.0
 local isBrakingForward = false
 local isBrakingReverse = false
-
 local healthEngineLast = 1000.0
 local healthEngineCurrent = 1000.0
 local healthEngineNew = 1000.0
 local healthEngineDelta = 0.0
 local healthEngineDeltaScaled = 0.0
-
 local healthBodyLast = 1000.0
 local healthBodyCurrent = 1000.0
 local healthBodyNew = 1000.0
 local healthBodyDelta = 0.0
 local healthBodyDeltaScaled = 0.0
-
 local healthPetrolTankLast = 1000.0
 local healthPetrolTankCurrent = 1000.0
 local healthPetrolTankNew = 1000.0
@@ -362,19 +359,21 @@ AddEventHandler('iens:repair', function()
 				healthPetrolTankLast=750.0
 					SetVehicleEngineOn(vehicle, true, false )
 				SetVehicleOilLevel(vehicle,(GetVehicleOilLevel(vehicle)/3)-0.5)
-				notification("~g~" .. repairCfg.fixMessages[fixMessagePos] .. ", and now go to a garage!")
+				QBCore.Functions.Notify(.. repairCfg.fixMessages[fixMessagePos] .. ", and now go to a garage!", "success")
+					
 				fixMessagePos = fixMessagePos + 1
 				if fixMessagePos > repairCfg.fixMessageCount then fixMessagePos = 1 end
 			else
-				notification("~r~Your vehicle is too damaged!")
+				QBCore.Functions.Notify("Your vehicle is too damaged!", "error")
 			end
 		else
-			notification("~y~" .. repairCfg.noFixMessages[noFixMessagePos] )
+			QBCore.Functions.Notify(.. repairCfg.noFixMessages[noFixMessagePos], "error")
+				
 			noFixMessagePos = noFixMessagePos + 1
 			if noFixMessagePos > repairCfg.noFixMessageCount then noFixMessagePos = 1 end
 		end
 	else
-		notification("~y~You must be in a vehicle to repair it!")
+		QBCore.Functions.Notify("You must be in a vehicle to repair it!", "error")
 	end
 end)
 
@@ -386,7 +385,7 @@ AddEventHandler('iens:repaira', function()
 		SetVehicleDirtLevel(vehicle)
 		SetVehicleUndriveable(vehicle, false)
 		WashDecalsFromVehicle(vehicle, 1.0)
-		notification("Vehicle repaired!")
+		QBCore.Functions.Notify("Vehicle repaired!", "success")	
 		SetVehicleFixed(vehicle)
 		healthBodyLast=1000.0
 		healthEngineLast=1000.0
@@ -394,20 +393,18 @@ AddEventHandler('iens:repaira', function()
 		SetVehicleEngineOn(vehicle, true, false )
 		return
 	else
-		notification("You must be in a vehicle to repair it!")
+		QBCore.Functions.Notify("You must be in a vehicle to repair it!", "error")	
 	end
 end)
 
 RegisterNetEvent('iens:besked')
 AddEventHandler('iens:besked', function()
-
-notification("~r~There is roadside assistance available call that via your phone!")
-
+	QBCore.Functions.Notify("There is roadside assistance available call that via your phone!", "error")	
 end)
 
 RegisterNetEvent('iens:notAllowed')
 AddEventHandler('iens:notAllowed', function()
-	notification("~r~You don't have permission to repair vehicles")
+	QBCore.Functions.Notify("You don't have permission to repair vehicles", "error")	
 end)
 
 if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
@@ -686,4 +683,3 @@ function procent(time)
     until(TimeLeft == 100)
     showPro = false
 end
-
