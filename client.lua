@@ -1,4 +1,3 @@
-local pedInSameVehicleLast=false
 local vehicle
 local lastVehicle
 local vehicleClass
@@ -24,30 +23,11 @@ local healthPetrolTankNew = 1000.0
 local healthPetrolTankDelta = 0.0
 local healthPetrolTankDeltaScaled = 0.0
 local tireBurstLuckyNumber
-local showPro = false
 
 math.randomseed(GetGameTimer());
 
 local tireBurstMaxNumber = cfg.randomTireBurstInterval * 1200; 												-- the tire burst lottery runs roughly 1200 times per minute
 if cfg.randomTireBurstInterval ~= 0 then tireBurstLuckyNumber = math.random(tireBurstMaxNumber) end			-- If we hit this number again randomly, a tire will burst.
-
-local fixMessagePos = math.random(repairCfg.fixMessageCount)
-local noFixMessagePos = math.random(repairCfg.noFixMessageCount)
-
--- Display blips on map
-Citizen.CreateThread(function()
-	if (cfg.displayBlips == true) then
-		for _, item in pairs(repairCfg.mechanics) do
-			item.blip = AddBlipForCoord(item.x, item.y, item.z)
-			SetBlipSprite(item.blip, item.id)
-			SetBlipScale(item.blip, 0.8)
-			SetBlipAsShortRange(item.blip, true)
-			BeginTextCommandSetBlipName("STRING")
-			AddTextComponentString(item.name)
-			EndTextCommandSetBlipName(item.blip)
-		end
-	end
-end)
 
 RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle')
 AddEventHandler('qb-vehiclefailure:client:RepairVehicle', function()
@@ -242,23 +222,12 @@ local function isPedDrivingAVehicle()
 		if GetPedInVehicleSeat(vehicle, -1) == ped then
 			local class = GetVehicleClass(vehicle)
 			-- We don't want planes, helicopters, bicycles and trains
-			if class ~= 21 and class ~= 13 then
+			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
 				return true
 			end
 		end
 	end
 	return false
-end
-
-local function IsNearMechanic()
-	local ped = PlayerPedId()
-	local pedLocation = GetEntityCoords(ped, 0)
-	for _, item in pairs(repairCfg.mechanics) do
-		local distance = #(vector3(item.x, item.y, item.z) - pedLocation)
-		if distance <= item.r then
-			return true
-		end
-	end
 end
 
 local function fscale(inputValue, originalMin, originalMax, newBegin, newEnd, curve)
@@ -306,41 +275,6 @@ local function fscale(inputValue, originalMin, originalMax, newBegin, newEnd, cu
 
 	return rangedValue
 end
-
-
-
-local function tireBurstLottery()
-	local tireBurstNumber = math.random(tireBurstMaxNumber)
-	if tireBurstNumber == tireBurstLuckyNumber then
-		-- We won the lottery, lets burst a tire.
-		if GetVehicleTyresCanBurst(vehicle) == false then return end
-		local numWheels = GetVehicleNumberOfWheels(vehicle)
-		local affectedTire
-		if numWheels == 2 then
-			affectedTire = (math.random(2)-1)*4		-- wheel 0 or 4
-		elseif numWheels == 4 then
-			affectedTire = (math.random(4)-1)
-			if affectedTire > 1 then affectedTire = affectedTire + 2 end	-- 0, 1, 4, 5
-		elseif numWheels == 6 then
-			affectedTire = (math.random(6)-1)
-		else
-			affectedTire = 0
-		end
-		SetVehicleTyreBurst(vehicle, affectedTire, false, 1000.0)
-		tireBurstLuckyNumber = math.random(tireBurstMaxNumber)			-- Select a new number to hit, just in case some numbers occur more often than others
-	end
-end
-
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(7)
-        local pos = GetEntityCoords(PlayerPedId(), true)
-        if showPro then
-            QBCore.Functions.DrawText3D(pos.x, pos.y, pos.z, TimeLeft .. '~g~%')
-        end
-    end
-end)
-
 
 RegisterNetEvent('iens:repair')
 AddEventHandler('iens:repair', function()
@@ -410,7 +344,7 @@ end)
 if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 	Citizen.CreateThread(function()
 		while true do
-			Citizen.Wait(0)
+			Citizen.Wait(7)
 			if cfg.torqueMultiplierEnabled or cfg.sundayDriver or cfg.limpMode then
 				if pedInSameVehicleLast then
 					local factor = 1.0
@@ -434,7 +368,7 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Forward and braking
 								isBrakingForward = true
 								brk = fscale(brake, 127.0, 254.0, 0.01, fBrakeForce, 10.0-(cfg.sundayDriverBrakeCurve*2.0))
-								--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
+								exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
 							end
 						elseif speed <= -1.0 then
 							-- Going reverse
@@ -442,7 +376,7 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Reversing and accelerating (using the brake)
 								local rev = fscale(brake, 127.0, 254.0, 0.1, 1.0, 10.0-(cfg.sundayDriverAcceleratorCurve*2.0))
 								factor = factor * rev
-								--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
+								exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
 							end
 							if accelerator > 127 then
 								-- Reversing and braking (Using the accelerator)
@@ -487,9 +421,9 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 			end
 			if cfg.preventVehicleFlip then
 				local roll = GetEntityRoll(vehicle)
-				if (roll > 75.0 or roll < -75.0) and GetEntitySpeed(vehicle) < 2 then
-					DisableControlAction(2,59,true) -- Disable left/right
-					DisableControlAction(2,60,true) -- Disable up/down
+				if (roll > 70.0 or roll < -70.0) and GetEntitySpeed(vehicle) < 5 and not IsThisModelABike(vehicle) and not IsThisModelABoat(vehicle) and not IsThisModelAPlane(vehicle) then
+					DisableControlAction(0,59,true) -- Disable left/right
+					DisableControlAction(0,60,true) -- Disable up/down
 				end
 			end
 		end
@@ -504,13 +438,17 @@ Citizen.CreateThread(function()
 			vehicle = GetVehiclePedIsIn(ped, false)
 			vehicleClass = GetVehicleClass(vehicle)
 			healthEngineCurrent = GetVehicleEngineHealth(vehicle)
-			if healthEngineCurrent == 1000 then healthEngineLast = 1000.0 end
+			if healthEngineCurrent >= 1000 then
+				SetVehicleEngineHealth(vehicle, 1000.00)
+				healthEngineLast = 1000.0 
 			healthEngineNew = healthEngineCurrent
 			healthEngineDelta = healthEngineLast - healthEngineCurrent
 			healthEngineDeltaScaled = healthEngineDelta * cfg.damageFactorEngine * cfg.classDamageMultiplier[vehicleClass]
 
 			healthBodyCurrent = GetVehicleBodyHealth(vehicle)
-			if healthBodyCurrent == 1000 then healthBodyLast = 1000.0 end
+			if healthBodyCurrent > 1000 then
+				SetVehicleBodyHealth(vehicle, 1000.00)
+				healthBodyLast = 1000.0 
 			healthBodyNew = healthBodyCurrent
 			healthBodyDelta = healthBodyLast - healthBodyCurrent
 			healthBodyDeltaScaled = healthBodyDelta * cfg.damageFactorBody * cfg.classDamageMultiplier[vehicleClass]
@@ -521,7 +459,9 @@ Citizen.CreateThread(function()
 				--	healthPetrolTankCurrent = healthPetrolTankLast
 				healthPetrolTankLast = healthPetrolTankCurrent
 			end
-			if healthPetrolTankCurrent == 1000 then healthPetrolTankLast = 1000.0 end
+			if healthPetrolTankCurrent >= 1000 then
+				healthPetrolTankLast = 1000.0 
+			end
 			healthPetrolTankNew = healthPetrolTankCurrent
 			healthPetrolTankDelta = healthPetrolTankLast-healthPetrolTankCurrent
 			healthPetrolTankDeltaScaled = healthPetrolTankDelta * cfg.damageFactorPetrolTank * cfg.classDamageMultiplier[vehicleClass]
@@ -660,26 +600,3 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-local DamageComponents = {
-    "radiator",
-    "axle",
-    "clutch",
-	"fuel",
-	"brakes",
-}
-function DamageRandomComponent()
-	local dmgFctr = math.random() + math.random(0, 2)
-	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
-	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), randomComponent, exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), randomComponent) - randomDamage)
-end
-
-function procent(time)
-    showPro = true
-    TimeLeft = 0
-    repeat
-        TimeLeft = TimeLeft + 1
-        Citizen.Wait(time)
-    until(TimeLeft == 100)
-    showPro = false
-end
