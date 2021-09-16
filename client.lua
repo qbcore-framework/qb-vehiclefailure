@@ -24,30 +24,11 @@ local healthPetrolTankNew = 1000.0
 local healthPetrolTankDelta = 0.0
 local healthPetrolTankDeltaScaled = 0.0
 local tireBurstLuckyNumber
-local showPro = false
 
 math.randomseed(GetGameTimer());
 
 local tireBurstMaxNumber = cfg.randomTireBurstInterval * 1200; 												-- the tire burst lottery runs roughly 1200 times per minute
 if cfg.randomTireBurstInterval ~= 0 then tireBurstLuckyNumber = math.random(tireBurstMaxNumber) end			-- If we hit this number again randomly, a tire will burst.
-
-local fixMessagePos = math.random(repairCfg.fixMessageCount)
-local noFixMessagePos = math.random(repairCfg.noFixMessageCount)
-
--- Display blips on map
-Citizen.CreateThread(function()
-	if (cfg.displayBlips == true) then
-		for _, item in pairs(repairCfg.mechanics) do
-			item.blip = AddBlipForCoord(item.x, item.y, item.z)
-			SetBlipSprite(item.blip, item.id)
-			SetBlipScale(item.blip, 0.8)
-			SetBlipAsShortRange(item.blip, true)
-			BeginTextCommandSetBlipName("STRING")
-			AddTextComponentString(item.name)
-			EndTextCommandSetBlipName(item.blip)
-		end
-	end
-end)
 
 RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle')
 AddEventHandler('qb-vehiclefailure:client:RepairVehicle', function()
@@ -230,10 +211,6 @@ function IsBackEngine(vehModel)
     return false
 end
 
-local function notification(msg)
-	QBCore.Functions.Notify(msg)
-end
-
 local function isPedDrivingAVehicle()
 	local ped = PlayerPedId()
 	vehicle = GetVehiclePedIsIn(ped, false)
@@ -242,23 +219,12 @@ local function isPedDrivingAVehicle()
 		if GetPedInVehicleSeat(vehicle, -1) == ped then
 			local class = GetVehicleClass(vehicle)
 			-- We don't want planes, helicopters, bicycles and trains
-			if class ~= 21 and class ~= 13 then
+			if class ~= 15 and class ~= 16 and class ~=21 and class ~=13 then
 				return true
 			end
 		end
 	end
 	return false
-end
-
-local function IsNearMechanic()
-	local ped = PlayerPedId()
-	local pedLocation = GetEntityCoords(ped, 0)
-	for _, item in pairs(repairCfg.mechanics) do
-		local distance = #(vector3(item.x, item.y, item.z) - pedLocation)
-		if distance <= item.r then
-			return true
-		end
-	end
 end
 
 local function fscale(inputValue, originalMin, originalMax, newBegin, newEnd, curve)
@@ -307,8 +273,6 @@ local function fscale(inputValue, originalMin, originalMax, newBegin, newEnd, cu
 	return rangedValue
 end
 
-
-
 local function tireBurstLottery()
 	local tireBurstNumber = math.random(tireBurstMaxNumber)
 	if tireBurstNumber == tireBurstLuckyNumber then
@@ -330,82 +294,6 @@ local function tireBurstLottery()
 		tireBurstLuckyNumber = math.random(tireBurstMaxNumber)			-- Select a new number to hit, just in case some numbers occur more often than others
 	end
 end
-
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(7)
-        local pos = GetEntityCoords(PlayerPedId(), true)
-        if showPro then
-            QBCore.Functions.DrawText3D(pos.x, pos.y, pos.z, TimeLeft .. '~g~%')
-        end
-    end
-end)
-
-
-RegisterNetEvent('iens:repair')
-AddEventHandler('iens:repair', function()
-	if isPedDrivingAVehicle() then
-		local ped = PlayerPedId()
-		vehicle = GetVehiclePedIsIn(ped, false)
-		if IsNearMechanic() then
-			return
-		end
-		if GetVehicleEngineHealth(vehicle) < cfg.cascadingFailureThreshold + 5 then
-			if GetVehicleOilLevel(vehicle) > 0 then
-				SetVehicleUndriveable(vehicle,false)
-				SetVehicleEngineHealth(vehicle, cfg.cascadingFailureThreshold + 5)
-				SetVehiclePetrolTankHealth(vehicle, 750.0)
-				healthEngineLast=cfg.cascadingFailureThreshold +5
-				healthPetrolTankLast=750.0
-					SetVehicleEngineOn(vehicle, true, false )
-				SetVehicleOilLevel(vehicle,(GetVehicleOilLevel(vehicle)/3)-0.5)
-				notification("~g~" .. repairCfg.fixMessages[fixMessagePos] .. ", and now go to a garage!")
-				fixMessagePos = fixMessagePos + 1
-				if fixMessagePos > repairCfg.fixMessageCount then fixMessagePos = 1 end
-			else
-				notification("~r~Your vehicle is too damaged!")
-			end
-		else
-			notification("~y~" .. repairCfg.noFixMessages[noFixMessagePos] )
-			noFixMessagePos = noFixMessagePos + 1
-			if noFixMessagePos > repairCfg.noFixMessageCount then noFixMessagePos = 1 end
-		end
-	else
-		notification("~y~You must be in a vehicle to repair it!")
-	end
-end)
-
-RegisterNetEvent('iens:repaira')
-AddEventHandler('iens:repaira', function()
-	if isPedDrivingAVehicle() then
-		local ped = PlayerPedId()
-		vehicle = GetVehiclePedIsIn(ped, false)
-		SetVehicleDirtLevel(vehicle)
-		SetVehicleUndriveable(vehicle, false)
-		WashDecalsFromVehicle(vehicle, 1.0)
-		notification("Vehicle repaired!")
-		SetVehicleFixed(vehicle)
-		healthBodyLast=1000.0
-		healthEngineLast=1000.0
-		healthPetrolTankLast=1000.0
-		SetVehicleEngineOn(vehicle, true, false )
-		return
-	else
-		notification("You must be in a vehicle to repair it!")
-	end
-end)
-
-RegisterNetEvent('iens:besked')
-AddEventHandler('iens:besked', function()
-
-notification("~r~There is roadside assistance available call that via your phone!")
-
-end)
-
-RegisterNetEvent('iens:notAllowed')
-AddEventHandler('iens:notAllowed', function()
-	notification("~r~You don't have permission to repair vehicles")
-end)
 
 if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 	Citizen.CreateThread(function()
@@ -434,7 +322,6 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Forward and braking
 								isBrakingForward = true
 								brk = fscale(brake, 127.0, 254.0, 0.01, fBrakeForce, 10.0-(cfg.sundayDriverBrakeCurve*2.0))
-								--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
 							end
 						elseif speed <= -1.0 then
 							-- Going reverse
@@ -442,7 +329,6 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Reversing and accelerating (using the brake)
 								local rev = fscale(brake, 127.0, 254.0, 0.1, 1.0, 10.0-(cfg.sundayDriverAcceleratorCurve*2.0))
 								factor = factor * rev
-								--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes", exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), "brakes") - 0.01)
 							end
 							if accelerator > 127 then
 								-- Reversing and braking (Using the accelerator)
@@ -660,26 +546,3 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
-local DamageComponents = {
-    "radiator",
-    "axle",
-    "clutch",
-	"fuel",
-	"brakes",
-}
-function DamageRandomComponent()
-	local dmgFctr = math.random() + math.random(0, 2)
-	local randomComponent = DamageComponents[math.random(1, #DamageComponents)]
-	local randomDamage = (math.random() + math.random(0, 1)) * dmgFctr
-	--exports['qb-vehicletuning']:SetVehicleStatus(GetVehicleNumberPlateText(vehicle), randomComponent, exports['qb-vehicletuning']:GetVehicleStatus(GetVehicleNumberPlateText(vehicle), randomComponent) - randomDamage)
-end
-
-function procent(time)
-    showPro = true
-    TimeLeft = 0
-    repeat
-        TimeLeft = TimeLeft + 1
-        Citizen.Wait(time)
-    until(TimeLeft == 100)
-    showPro = false
-end
