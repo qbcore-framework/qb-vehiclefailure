@@ -157,11 +157,9 @@ function RepairVehicleFull(vehicle)
 		QBCore.Functions.Notify("Vehicle repaired!")
 		SetVehicleEngineHealth(vehicle, 1000.0)
 		SetVehicleEngineOn(vehicle, true, false)
-		SetVehicleTyreFixed(vehicle, 0)
-		SetVehicleTyreFixed(vehicle, 1)
-		SetVehicleTyreFixed(vehicle, 2)
-		SetVehicleTyreFixed(vehicle, 3)
-		SetVehicleTyreFixed(vehicle, 4)
+		for i = 0, 11 do
+                	SetVehicleTyreFixed(vehicle, i)
+		end
 		if (IsBackEngine(GetEntityModel(vehicle))) then
 			SetVehicleDoorShut(vehicle, 5, false)
 		else
@@ -199,11 +197,9 @@ function RepairVehicle(vehicle)
 		QBCore.Functions.Notify("Vehicle repaired!")
 		SetVehicleEngineHealth(vehicle, 500.0)
 		SetVehicleEngineOn(vehicle, true, false)
-		SetVehicleTyreFixed(vehicle, 0)
-		SetVehicleTyreFixed(vehicle, 1)
-		SetVehicleTyreFixed(vehicle, 2)
-		SetVehicleTyreFixed(vehicle, 3)
-		SetVehicleTyreFixed(vehicle, 4)
+		for i = 0, 11 do
+                	SetVehicleTyreFixed(vehicle, i)
+		end
 		if (IsBackEngine(GetEntityModel(vehicle))) then
 			SetVehicleDoorShut(vehicle, 5, false)
 		else
