@@ -291,12 +291,6 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle', function()
 	end
 end)
 
-RegisterNetEvent('qb-vehiclefailure:client:SyncWash', function(veh)
-	SetVehicleDirtLevel(veh, 0.1)
-	SetVehicleUndriveable(veh, false)
-	WashDecalsFromVehicle(veh, 1.0)
-end)
-
 RegisterNetEvent('qb-vehiclefailure:client:CleanVehicle', function()
 	local vehicle = QBCore.Functions.GetClosestVehicle()
 	if vehicle ~= nil and vehicle ~= 0 then
