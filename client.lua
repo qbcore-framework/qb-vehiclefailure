@@ -47,31 +47,6 @@ local function DamageRandomComponent()
 	--exports['qb-vehicletuning']:SetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent, exports['qb-vehicletuning']:GetVehicleStatus(QBCore.Functions.GetPlate(vehicle), randomComponent) - randomDamage)
 end
 
-local function CleanVehicle(vehicle)
-	local ped = PlayerPedId()
-	local pos = GetEntityCoords(ped)
-	TaskStartScenarioInPlace(ped, "WORLD_HUMAN_MAID_CLEAN", 0, true)
-	QBCore.Functions.Progressbar("cleaning_vehicle", Lang:t("progress.clean_veh"), math.random(10000, 20000), false, true, {
-		disableMovement = true,
-		disableCarMovement = true,
-		disableMouse = false,
-		disableCombat = true,
-	}, {}, {}, {}, function() -- Done
-		QBCore.Functions.Notify(Lang:t("success.cleaned_veh"))
-		SetVehicleDirtLevel(vehicle, 0.1)
-        SetVehicleUndriveable(vehicle, false)
-		WashDecalsFromVehicle(vehicle, 1.0)
-		TriggerServerEvent('qb-vehiclefailure:server:removewashingkit', vehicle)
-		TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["cleaningkit"], "remove")
-		ClearAllPedProps(ped)
-		ClearPedTasks(ped)
-	end, function() -- Cancel
-		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
-		ClearAllPedProps(ped)
-		ClearPedTasks(ped)
-	end)
-end
-
 local function IsBackEngine(vehModel)
 	if BackEngineVehicles[vehModel] then return true else return false end
 end
@@ -287,18 +262,6 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicle', function()
 			QBCore.Functions.Notify(Lang:t("error.not_near_veh"), "error")
 		else
 			QBCore.Functions.Notify(Lang:t("error.healthy_veh"), "error")
-		end
-	end
-end)
-
-RegisterNetEvent('qb-vehiclefailure:client:CleanVehicle', function()
-	local vehicle = QBCore.Functions.GetClosestVehicle()
-	if vehicle ~= nil and vehicle ~= 0 then
-		local ped = PlayerPedId()
-		local pos = GetEntityCoords(ped)
-		local vehpos = GetEntityCoords(vehicle)
-		if #(pos - vehpos) < 3.0 and not IsPedInAnyVehicle(ped) then
-			CleanVehicle(vehicle)
 		end
 	end
 end)
