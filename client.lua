@@ -82,7 +82,7 @@ local function RepairVehicleFull(vehicle)
 		else
 			SetVehicleDoorShut(vehicle, 4, false)
 		end
-		TriggerServerEvent('qb-vehiclefailure:removeItem', "advancedrepairkit")
+		TriggerServerEvent('smallresources:server:removeItem', "advancedrepairkit")
 	end, function() -- Cancel
 		StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
 		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
@@ -124,7 +124,7 @@ local function RepairVehicle(vehicle)
 		else
 			SetVehicleDoorShut(vehicle, 4, false)
 		end
-		TriggerServerEvent('qb-vehiclefailure:removeItem', "repairkit")
+		TriggerServerEvent('smallresources:server:removeItem', "repairkit")
 	end, function() -- Cancel
 		StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
 		QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
