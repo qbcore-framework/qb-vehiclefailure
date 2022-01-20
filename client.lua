@@ -546,7 +546,6 @@ CreateThread(function()
 				pedInSameVehicleLast = false
 			end
 
-
 			if pedInSameVehicleLast == true then
 				-- Damage happened while in the car = can be multiplied
 
@@ -566,11 +565,9 @@ CreateThread(function()
 						healthEngineCombinedDelta = healthEngineCurrent - (cfg.cascadingFailureThreshold / 5)
 					end
 
-
 					------- Calculate new value
 
 					healthEngineNew = healthEngineLast - healthEngineCombinedDelta
-
 
 					------- Sanity Check on new values and further manipulations
 
@@ -665,3 +662,63 @@ CreateThread(function()
 		end
 	end
 end)
+
+
+if cfg.stall then
+	CreateThread(function()
+		local SucceededAttempts = 0
+		local NeededAttempts = 1
+		local stalled = false
+		while true do
+			local sleep = cfg.stallRefresh
+			local ped = PlayerPedId()
+			local vehicle = GetVehiclePedIsIn(ped, false)
+			if isPedDrivingAVehicle() and DoesEntityExist(vehicle) then 
+				local currentDamage = GetVehicleBodyHealth(vehicle) 
+				if currentDamage ~= oldBodyDamage then 
+					if not stalled and (currentDamage < oldBodyDamage) and ((oldBodyDamage - currentDamage) >= cfg.stallDamageRequired) then
+						if(math.random(1,100) < cfg.stallChance) then
+							stalled = true
+							SetVehicleEngineOn(vehicle,false,true,true)
+							Wait(50)
+						end 
+					end 
+					oldBodyDamage = currentDamage
+				end 
+			else 
+				oldBodyDamage = 0
+			end
+			if stalled and isPedDrivingAVehicle() then -- what happens when we're stalled?
+				stalled = true
+				local Skillbar = exports['qb-skillbar']:GetSkillbarObject()
+				SetVehicleEngineOn(vehicle, false, false, true)
+				SetVehicleUndriveable(vehicle, true)
+				SetVehicleAudioBodyDamageFactor(vehicle, 0.35)
+				QBCore.Functions.Notify(Lang:t("error.failed_notification"), "error")
+				Wait(50)
+				Skillbar.Start({
+					duration = math.random(1000, 5000),
+					pos = math.random(10, 30),
+					width = math.random(10, 20),
+				}, function()
+					if SucceededAttempts + 1 > NeededAttempts then
+						stalled = false
+						SetVehicleEngineOn(vehicle, true, false, true)
+						SetVehicleUndriveable(vehicle, false)
+					else
+						stalled = true
+						local length = math.random(cfg.stallMinWaitTime,cfg.stallMaxWaitTime)
+						Wait(length)
+						SetVehicleEngineOn(vehicle, false, true, true) -- redundant, cars love to re-start themselves no matter how hard you try.
+					end
+				end)
+				if GetPedInVehicleSeat(vehicle, -1) == ped then
+					SetVehicleUndriveable(vehicle, false)
+					SetVehicleEngineOn(vehicle, true, true, false)
+					QBCore.Functions.Notify(Lang:t("success.success_notification"), "success")
+				end
+			end
+			Wait(sleep)
+		end 
+	end)
+end

@@ -78,6 +78,13 @@ cfg = {
 	randomTireBurstInterval = 0,				-- Number of minutes (statistically, not precisely) to drive above 22 mph before you get a tire puncture. 0=feature is disabled
 
 
+	stall = false,
+	stallRefresh = 50, 							-- Lower values faster checks more overhead, set to your contentedness
+	stallChance = 80,							-- Effective chance when damage threshold is reached for engine to stall
+	stallDamageRequired = 25,					-- Threshold for damage to begin stall check
+	stallMinWaitTime = 1000,					-- Minimum length of a vehicle stall
+	stallMaxWaitTime = 5000,					-- Maximum length ofa  vehicle stall
+
 	-- Class Damagefactor Multiplier
 	-- The damageFactor for engine, body and Petroltank will be multiplied by this value, depending on vehicle class
 	-- Use it to increase or decrease damage for each class

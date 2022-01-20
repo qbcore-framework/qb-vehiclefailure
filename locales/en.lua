@@ -18,6 +18,7 @@ local Translations = {
         ["nofix_message_6"] = "Never try to make something that isn't broken, but you didn't listen",
     },
     success = {
+        ["success_notification"] = "Successfully restarted the vehicle!",
         ["cleaned_veh"] = "Vehicle cleaned!",
         ["repaired_veh"] = "Vehicle repaired!",
         ["fix_message_1"] = "You checked the oil level",
