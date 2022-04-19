@@ -75,6 +75,15 @@ local function IsBackEngine(vehModel)
 	if BackEngineVehicles[vehModel] then return true else return false end
 end
 
+local function FixVehicleTyres(veh)
+	SetVehicleTyreFixed(veh, 0)
+	SetVehicleTyreFixed(veh, 1)
+	SetVehicleTyreFixed(veh, 2)
+	SetVehicleTyreFixed(veh, 3)
+	SetVehicleTyreFixed(veh, 4)
+	SetVehicleTyreFixed(veh, 5)
+end
+
 local function RepairVehicleFull(veh)
 	if (IsBackEngine(GetEntityModel(veh))) then
         SetVehicleDoorOpen(veh, 5, false, false)
@@ -96,12 +105,8 @@ local function RepairVehicleFull(veh)
 		QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
 		SetVehicleEngineHealth(veh, 1000.0)
 		SetVehicleEngineOn(veh, true, false)
-		SetVehicleTyreFixed(veh, 0)
-		SetVehicleTyreFixed(veh, 1)
-		SetVehicleTyreFixed(veh, 2)
-		SetVehicleTyreFixed(veh, 3)
-		SetVehicleTyreFixed(veh, 4)
-		if (IsBackEngine(GetEntityModel(veh))) then
+		FixVehicleTyres(veh)
+		if (IsBackEngine(GetEntityModel(vehicle))) then
 			SetVehicleDoorShut(veh, 5, false)
 		else
 			SetVehicleDoorShut(veh, 4, false)
@@ -138,11 +143,7 @@ local function RepairVehicle(veh)
 		QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
 		SetVehicleEngineHealth(veh, 500.0)
 		SetVehicleEngineOn(veh, true, false)
-		SetVehicleTyreFixed(veh, 0)
-		SetVehicleTyreFixed(veh, 1)
-		SetVehicleTyreFixed(veh, 2)
-		SetVehicleTyreFixed(veh, 3)
-		SetVehicleTyreFixed(veh, 4)
+		FixVehicleTyres(veh)
 		if (IsBackEngine(GetEntityModel(veh))) then
 			SetVehicleDoorShut(veh, 5, false)
 		else
