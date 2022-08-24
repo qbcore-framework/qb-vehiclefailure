@@ -456,16 +456,18 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 								-- Not sliding sideways
 								if isBrakingForward == true then
 									--Stopped or going slightly forward while braking
+									--Check for config variable
 									if cfg.preventVehicleReverse then
-										DisableControlAction(2,72,true) -- Disable Brake until user lets go of brake
+										DisableControlAction(2,72,true) --Disable Brake until user lets go of brake
 									end
 									SetVehicleForwardSpeed(vehicle,speed*0.98)
 									SetVehicleBrakeLights(vehicle,true)
 								end
 								if isBrakingReverse == true then
 									--Stopped or going slightly in reverse while braking
+									--Check for config variable
 									if cfg.preventVehicleReverse then
-										DisableControlAction(2,71,true) -- Disable reverse Brake until user lets go of reverse brake (Accelerator)
+										DisableControlAction(2,71,true) --Disable reverse Brake until user lets go of reverse brake (Accelerator)
 									end
 									SetVehicleForwardSpeed(vehicle,speed*0.98)
 									SetVehicleBrakeLights(vehicle,true)
