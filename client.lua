@@ -393,23 +393,9 @@ end)
 
 -- Threads
 
-CreateThread(function()
-	if (cfg.displayBlips == true) then
-		for _, item in pairs(repairCfg.mechanics) do
-			item.blip = AddBlipForCoord(item.x, item.y, item.z)
-			SetBlipSprite(item.blip, item.id)
-			SetBlipScale(item.blip, 0.8)
-			SetBlipAsShortRange(item.blip, true)
-			BeginTextCommandSetBlipName("STRING")
-			AddTextComponentString(item.name)
-			EndTextCommandSetBlipName(item.blip)
-		end
-	end
-end)
-
 if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
-	CreateThread(function()
-		while true do
+	RegisterNetEvent('QBCore:Client:EnteredVehicle', function()
+		while IsPedInAnyVehicle(PlayerPedId()) do
 			Wait(0)
 			if cfg.torqueMultiplierEnabled or cfg.sundayDriver or cfg.limpMode then
 				if pedInSameVehicleLast then
@@ -496,8 +482,8 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
 	end)
 end
 
-CreateThread(function()
-	while true do
+RegisterNetEvent('QBCore:Client:EnteredVehicle', function()
+	while IsPedInAnyVehicle(PlayerPedId()) do
 		Wait(50)
 		local ped = PlayerPedId()
 		if isPedDrivingAVehicle() then
