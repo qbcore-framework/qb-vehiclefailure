@@ -334,7 +334,7 @@ end)
 
 RegisterNetEvent('iens:repaira', function()
 	local ped = PlayerPedId()
-    if IsPedInAnyVehicle(ped, false) then
+    if IsPedInAnyVehicle(ped, false) or IsPedInAnyPlane(ped) then
         vehicle = GetVehiclePedIsIn(ped, false)
         SetVehicleDirtLevel(vehicle)
         SetVehicleUndriveable(vehicle, false)
@@ -345,10 +345,9 @@ RegisterNetEvent('iens:repaira', function()
         healthEngineLast=1000.0
         healthPetrolTankLast=1000.0
         SetVehicleEngineOn(vehicle, true, false )
-        return
-    else
-        QBCore.Functions.Notify(Lang:t("error.inside_veh_req"))
+        return true
     end
+    QBCore.Functions.Notify(Lang:t("error.inside_veh_req"))
 end)
 
 RegisterNetEvent('iens:besked', function()
