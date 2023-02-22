@@ -333,7 +333,7 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicleFull', function()
 end)
 
 RegisterNetEvent('iens:repaira', function()
-	local ped = PlayerPedId()
+    local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) or IsPedInAnyPlane(ped) then
         vehicle = GetVehiclePedIsIn(ped, false)
         SetVehicleDirtLevel(vehicle)
