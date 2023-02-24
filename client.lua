@@ -241,17 +241,17 @@ local function tireBurstLottery()
         local numWheels = GetVehicleNumberOfWheels(vehicle)
         local affectedTire
         if numWheels == 2 then
-            affectedTire = (math.random(2)-1)*4        -- wheel 0 or 4
+            affectedTire = (math.random(2) - 1) * 4 -- wheel 0 or 4
         elseif numWheels == 4 then
-            affectedTire = (math.random(4)-1)
-            if affectedTire > 1 then affectedTire = affectedTire + 2 end    -- 0, 1, 4, 5
+            affectedTire = (math.random(4) - 1)
+            if affectedTire > 1 then affectedTire = affectedTire + 2 end -- 0, 1, 4, 5
         elseif numWheels == 6 then
-            affectedTire = (math.random(6)-1)
+            affectedTire = (math.random(6) - 1)
         else
             affectedTire = 0
         end
         SetVehicleTyreBurst(vehicle, affectedTire, false, 1000.0)
-        tireBurstLuckyNumber = math.random(tireBurstMaxNumber)            -- Select a new number to hit, just in case some numbers occur more often than others
+        tireBurstLuckyNumber = math.random(tireBurstMaxNumber) -- Select a new number to hit, just in case some numbers occur more often than others
     end
 end
 
@@ -341,9 +341,9 @@ RegisterNetEvent('iens:repaira', function()
         WashDecalsFromVehicle(vehicle, 1.0)
         QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
         SetVehicleFixed(vehicle)
-        healthBodyLast=1000.0
-        healthEngineLast=1000.0
-        healthPetrolTankLast=1000.0
+        healthBodyLast = 1000.0
+        healthEngineLast = 1000.0
+        healthPetrolTankLast = 1000.0
         SetVehicleEngineOn(vehicle, true, false )
         return true
     end
@@ -367,7 +367,7 @@ RegisterNetEvent('iens:repair', function()
         end
         if GetVehicleEngineHealth(vehicle) < cfg.cascadingFailureThreshold + 5 then
             if GetVehicleOilLevel(vehicle) > 0 then
-                SetVehicleUndriveable(vehicle,false)
+                SetVehicleUndriveable(vehicle, false)
                 SetVehicleEngineHealth(vehicle, cfg.cascadingFailureThreshold + 5)
                 SetVehiclePetrolTankHealth(vehicle, 750.0)
                 healthEngineLast=cfg.cascadingFailureThreshold +5
@@ -446,7 +446,7 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
                             if accelerator > 127 then
                                 -- Reversing and braking (Using the accelerator)
                                 isBrakingReverse = true
-                                brk = fscale(accelerator, 127.0, 254.0, 0.01, fBrakeForce, 10.0-(cfg.sundayDriverBrakeCurve*2.0))
+                                brk = fscale(accelerator, 127.0, 254.0, 0.01, fBrakeForce, 10.0 - (cfg.sundayDriverBrakeCurve * 2.0))
                             end
                         else
                             -- Stopped or almost stopped or sliding sideways
@@ -455,23 +455,23 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
                                 -- Not sliding sideways
                                 if isBrakingForward == true then
                                     --Stopped or going slightly forward while braking
-                                    DisableControlAction(2,72,true) -- Disable Brake until user lets go of brake
-                                    SetVehicleForwardSpeed(vehicle,speed*0.98)
-                                    SetVehicleBrakeLights(vehicle,true)
+                                    DisableControlAction(2, 72, true) -- Disable Brake until user lets go of brake
+                                    SetVehicleForwardSpeed(vehicle, speed * 0.98)
+                                    SetVehicleBrakeLights(vehicle, true)
                                 end
                                 if isBrakingReverse == true then
                                     --Stopped or going slightly in reverse while braking
-                                    DisableControlAction(2,71,true) -- Disable reverse Brake until user lets go of reverse brake (Accelerator)
+                                    DisableControlAction(2, 71, true) -- Disable reverse Brake until user lets go of reverse brake (Accelerator)
                                     SetVehicleForwardSpeed(vehicle,speed*0.98)
                                     SetVehicleBrakeLights(vehicle,true)
                                 end
-                                if isBrakingForward == true and GetDisabledControlNormal(2,72) == 0 then
+                                if isBrakingForward == true and GetDisabledControlNormal(2, 72) == 0 then
                                     -- We let go of the brake
-                                    isBrakingForward=false
+                                    isBrakingForward = false
                                 end
-                                if isBrakingReverse == true and GetDisabledControlNormal(2,71) == 0 then
+                                if isBrakingReverse == true and GetDisabledControlNormal(2, 71) == 0 then
                                     -- We let go of the reverse brake (Accelerator)
-                                    isBrakingReverse=false
+                                    isBrakingReverse = false
                                 end
                             end
                         end
@@ -487,8 +487,8 @@ if cfg.torqueMultiplierEnabled or cfg.preventVehicleFlip or cfg.limpMode then
             if cfg.preventVehicleFlip then
                 local roll = GetEntityRoll(vehicle)
                 if (roll > 75.0 or roll < -75.0) and GetEntitySpeed(vehicle) < 2 then
-                    DisableControlAction(2,59,true) -- Disable left/right
-                    DisableControlAction(2,60,true) -- Disable up/down
+                    DisableControlAction(2, 59, true) -- Disable left/right
+                    DisableControlAction(2, 60, true) -- Disable up/down
                 end
             end
         end
