@@ -96,8 +96,8 @@ local function RepairVehicleFull(veh)
         QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
         SetVehicleEngineHealth(veh, 1000.0)
         SetVehicleEngineOn(veh, true, false)
-        for i = 0, 5 do 
-            SetVehicleTyreFixed(veh, i) 
+        for i = 0, 5 do
+            SetVehicleTyreFixed(veh, i)
             TriggerEvent('qb-vehiclefailure:client:TyreSync', veh, i)
         end
         if (IsBackEngine(GetEntityModel(veh))) then
@@ -137,8 +137,8 @@ local function RepairVehicle(veh)
         QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
         SetVehicleEngineHealth(veh, 500.0)
         SetVehicleEngineOn(veh, true, false)
-        for i = 0, 5 do 
-            SetVehicleTyreFixed(veh, i) 
+        for i = 0, 5 do
+            SetVehicleTyreFixed(veh, i)
             TriggerEvent('qb-vehiclefailure:client:TyreSync', veh, i)
         end
         if (IsBackEngine(GetEntityModel(veh))) then
