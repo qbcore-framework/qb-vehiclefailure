@@ -90,17 +90,16 @@ local function RepairVehicleFull(veh)
     }, {
         animDict = "mini@repair",
         anim = "fixing_a_player",
-        flags = 16,
+        flags = 1,
     }, {}, {}, function() -- Done
         StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
         QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
         SetVehicleEngineHealth(veh, 1000.0)
         SetVehicleEngineOn(veh, true, false)
-        SetVehicleTyreFixed(veh, 0)
-        SetVehicleTyreFixed(veh, 1)
-        SetVehicleTyreFixed(veh, 2)
-        SetVehicleTyreFixed(veh, 3)
-        SetVehicleTyreFixed(veh, 4)
+        for i = 0, 5 do
+            SetVehicleTyreFixed(veh, i)
+            TriggerEvent('qb-vehiclefailure:client:TyreSync', veh, i)
+        end
         if (IsBackEngine(GetEntityModel(veh))) then
             SetVehicleDoorShut(veh, 5, false)
         else
@@ -132,17 +131,16 @@ local function RepairVehicle(veh)
     }, {
         animDict = "mini@repair",
         anim = "fixing_a_player",
-        flags = 16,
+        flags = 1,
     }, {}, {}, function() -- Done
         StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_player", 1.0)
         QBCore.Functions.Notify(Lang:t("success.repaired_veh"))
         SetVehicleEngineHealth(veh, 500.0)
         SetVehicleEngineOn(veh, true, false)
-        SetVehicleTyreFixed(veh, 0)
-        SetVehicleTyreFixed(veh, 1)
-        SetVehicleTyreFixed(veh, 2)
-        SetVehicleTyreFixed(veh, 3)
-        SetVehicleTyreFixed(veh, 4)
+        for i = 0, 5 do
+            SetVehicleTyreFixed(veh, i)
+            TriggerEvent('qb-vehiclefailure:client:TyreSync', veh, i)
+        end
         if (IsBackEngine(GetEntityModel(veh))) then
             SetVehicleDoorShut(veh, 5, false)
         else
@@ -330,6 +328,11 @@ RegisterNetEvent('qb-vehiclefailure:client:RepairVehicleFull', function()
     else
         QBCore.Functions.Notify(Lang:t("error.not_near_veh"), "error")
     end
+end)
+
+RegisterNetEvent('qb-vehiclefailure:client:TyreSync', function(veh, tyre)
+    SetVehicleTyreFixed(veh, tyre)
+    SetVehicleWheelHealth(veh, tyre, 100)
 end)
 
 RegisterNetEvent('iens:repaira', function()
