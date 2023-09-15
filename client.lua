@@ -335,7 +335,7 @@ end)
 
 RegisterNetEvent('qb-vehiclefailure:client:TyreSync', function(veh, tyre)
     SetVehicleTyreFixed(veh, tyre)
-    SetVehicleWheelHealth(veh, tyre, 100)
+    SetVehicleWheelHealth(veh, tyre, 1000.0)
 end)
 
 RegisterNetEvent('iens:repaira', function()
